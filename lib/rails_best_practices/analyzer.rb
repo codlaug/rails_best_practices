@@ -59,12 +59,16 @@ module RailsBestPractices
 
     # Output the analyze result.
     def output
-      if @options["format"] == 'html'
+      case @options["format"]
+      when 'html'
         @options["output-file"] ||= "rails_best_practices_output.html"
         output_html_errors
-      elsif @options["format"] == 'yaml'
+      when 'yaml'
         @options["output-file"] ||= "rails_best_practices_output.yaml"
         output_yaml_errors
+      when 'tabs'
+        @options["output-file"] ||= "rails_best_practices_output.tabs"
+        output_tabs_errors
       else
         output_terminal_errors
       end
@@ -241,6 +245,15 @@ module RailsBestPractices
     def output_yaml_errors
       File.open(@options["output-file"], "w+") do |file|
         file.write YAML.dump(errors)
+      end
+    end
+
+    # output errors in tab-separated format.
+    def output_tabs_errors
+      File.open(@options["output-file"], "w+") do |file|
+        errors.each do |error|
+          file.puts "#{error.short_filename}\tline #{error.line_number}\t#{error.message}"
+        end
       end
     end
 
